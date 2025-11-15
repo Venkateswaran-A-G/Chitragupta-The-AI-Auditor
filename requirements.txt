@@ -1,0 +1,4 @@
+google-adk==0.0.12 # Or the latest stable version if you check PyPI
+google-generativeai==0.3.2
+google-api-python-client
+protobuf==3.20.3
