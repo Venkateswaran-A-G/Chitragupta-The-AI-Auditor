@@ -31,7 +31,7 @@ Current manual red-teaming methods are often slow, resource-intensive, and limit
 
 To better understand the flow of operations within Chitragupta, refer to the diagram below which illustrates the sequential and parallel interactions between our specialized agents.
 
-![Chitragupta Workflow Diagram](docs/Chitragupta_Workflow_Diagram.png)
+![Chitragupta Workflow Diagram](Chitragupta_Workflow_Diagram.png)
 
 ## 3. Architecture & Key Concepts
 
@@ -41,7 +41,7 @@ This project is submitted as a single Kaggle Notebook. All agents run in-memory.
 
 Chitragupta's core strength lies in its multi-agent swarm architecture, which provides superior diversity of thought and scalability compared to a single, monolithic AI attempting to self-evaluate.
 
-![Multi-Agent vs Monolithic AI](docs/Multi_Agent_vs_Monolithic.png)
+![Multi-Agent vs Monolithic AI](multi_agent_diagram.png)
 
 * **1. Multi-agent Workflows:** We demonstrate a complex workflow with both sequential and parallel steps. The `Orchestrator` sequentially calls the `PersonaGenerator` and `ReportAgent`, but it calls multiple `RedTeamAgent`s *in parallel* using `asyncio.gather`.
 * **2. Sessions & Memory:** The `OrchestratorAgent` is built with an `InMemorySessionService`. It uses this service to create a session for each test run and `session.update_context()` to persist state (like the list of personas and findings) across agent calls.
@@ -50,7 +50,7 @@ Chitragupta's core strength lies in its multi-agent swarm architecture, which pr
 
 Our agents leverage both built-in and custom tools to perform their specialized functions effectively.
 
-![Tools Utilized by Chitragupta](docs/Chitragupta_Tools.png)
+![Tools Utilized by Chitragupta](Chitragupta_Tools.png)
 
 * **3. Reasoning & Tool Use:**
     * **Reasoning:** Gemini provides the core reasoning for *all four* agents, each guided by a specialized system prompt.
@@ -61,7 +61,7 @@ Our agents leverage both built-in and custom tools to perform their specialized 
 
 The `OrchestratorAgent` intelligently manages the entire red-teaming process through an `InMemorySessionService`, ensuring continuity and context across all agent interactions.
 
-![Session and State Management](docs/Session_State_Management.png)
+![Session and State Management](Session_State_Management.png)
 
 
 ## 4. Value and Innovation
