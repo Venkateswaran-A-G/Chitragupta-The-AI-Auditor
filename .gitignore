@@ -1,0 +1,79 @@
+# Python Bytecode and Compilation
+#############################
+_pycache_/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+build/
+dist/
+
+# Virtual Environment
+#####################
+# Standard venv directory
+venv/
+env/
+# Poetry environment (if used)
+.venv/
+
+# Editor/IDE specific files
+##########################
+# VSCode
+.vscode/
+# PyCharm
+.idea/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# Vim
+*.swp
+*.swo
+# Emacs
+#*~
+#\#*#
+#/.#*
+
+# Operating System Files
+########################
+.DS_Store # macOS
+Thumbs.db # Windows
+ehthumbs.db # Windows
+.directory # Linux
+
+# Logs and Data
+###############
+*.log
+logs/
+*.sqlite3
+*.db
+data/ # If you have raw data files that shouldn't be committed
+
+# Jupyter/IPython Notebooks (if any are left over and shouldn't be versioned)
+#########################################################################
+.ipynb_checkpoints
+*.ipynb
+
+# Environment Variables and API Keys
+#####################################
+# Crucial for your project: DO NOT COMMIT your API keys or sensitive config
+.env
+.flaskenv
+*.env # Any file ending with .env
+api_keys.py # Or whatever file you store keys in
+
+# ADK specific (if temp files are generated)
+#############################################
+adk_cache/
+adk_sessions/
+
+# Temporary files created by various tools
+#########################################
+*.tmp
+*.temp
+temp
+
+# Package management related files (e.g., pip cache)
+###################################################
+.pip_cache/
