@@ -1,5 +1,4 @@
-# Chitragupta-The-AI-Auditor
-An autonomous multi-agent system for ethical red-teaming of LLMs using Google ADK and Gemini API.
+# Project Chitragupta: The AI Ethical Red-Teaming Swarm
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -17,23 +16,53 @@ Current manual red-teaming methods are often slow, resource-intensive, and limit
 
 ## 2. Solution: An Agent-to-Agent Swarm
 
-**Chitragupta** implements a "divide and conquer" workflow using specialized agents that communicate and cooperate:
+**Project Chitragupta** is an autonomous multi-agent system designed to simulate a diverse "red team" of adversarial users. It uses the Google Agent Development Kit (ADK) and the Gemini API to find ethical vulnerabilities in a target AI model *before* deployment.
+
+> **Why "Chitragupta"?** In Hindu mythology, Chitragupta is the divine scribe who meticulously records the *karma* (the good and bad deeds) of all beings. In the same way, our agent swarm meticulously observes, records, and reports every flaw and vulnerability of an AI model, creating a final, auditable report.
+
+**Chitragupta** implements a "divide and conquer" workflow using specialized agents:
 
 * **`OrchestratorAgent`**: The project manager. It oversees the entire red-teaming workflow, manages session state, and coordinates the specialist agents.
 * **`PersonaGeneratorAgent`**: The creative strategist. This agent uses Gemini's reasoning and the `GoogleSearchTool` to research and generate a diverse list of adversarial user personas.
 * **`RedTeamAgent` (Parallel Swarm)**: The attackers. The Orchestrator spawns *multiple* instances of this agent in parallel. Each `RedTeamAgent` adopts an assigned persona and uses a custom `TargetModelTool` to craft and deliver targeted, adversarial prompts to the model under test.
 * **`ReportAgent`**: The synthesizer. This agent gathers all the raw findings (logs of failed interactions, biased responses, etc.) from the `RedTeamAgent` swarm and uses Gemini's synthesis capabilities to generate a structured, prioritized, and actionable vulnerability report for human review.
 
+### Chitragupta's Red-Teaming Workflow Overview
+
+To better understand the flow of operations within Chitragupta, refer to the diagram below which illustrates the sequential and parallel interactions between our specialized agents.
+
+![Chitragupta Workflow Diagram](docs/Chitragupta_Workflow_Diagram.png)
+
 ## 3. Architecture & Key Concepts
 
-This project showcases several advanced ADK concepts:
+This project is submitted as a single Kaggle Notebook. All agents run in-memory.
 
-* **Multi-agent Workflows**: Demonstrates a complex workflow involving both sequential (Orchestrator calling Persona Generator then Report Agent) and parallel (Orchestrator spawning multiple Red Team Agents simultaneously using `asyncio.gather`) execution.
-* **Sessions & Memory**: The `OrchestratorAgent` utilizes an `InMemorySessionService` to maintain the state of each test run, persistently storing context such as the target model description, generated personas, and cumulative findings across various agent interactions.
-* **Reasoning & Tool Use**:
-    * **Reasoning**: All four agents leverage the Gemini LLM for specialized reasoning, each guided by a distinct system prompt tailored to its role (e.g., brainstorming, attacking, synthesizing).
-    * **Built-in Tool**: The `PersonaGeneratorAgent` effectively uses the `GoogleSearchTool()` to ground its persona creation in real-world data and common user complaints.
-    * **Custom Tool**: The `RedTeamAgent` employs a custom `TargetModelTool` to simulate interactions with the AI model being tested, allowing for flexible testing without needing a live API endpoint.
+### Multi-Agent vs. Monolithic Approach
+
+Chitragupta's core strength lies in its multi-agent swarm architecture, which provides superior diversity of thought and scalability compared to a single, monolithic AI attempting to self-evaluate.
+
+![Multi-Agent vs Monolithic AI](docs/Multi_Agent_vs_Monolithic.png)
+
+* **1. Multi-agent Workflows:** We demonstrate a complex workflow with both sequential and parallel steps. The `Orchestrator` sequentially calls the `PersonaGenerator` and `ReportAgent`, but it calls multiple `RedTeamAgent`s *in parallel* using `asyncio.gather`.
+* **2. Sessions & Memory:** The `OrchestratorAgent` is built with an `InMemorySessionService`. It uses this service to create a session for each test run and `session.update_context()` to persist state (like the list of personas and findings) across agent calls.
+
+### Tools Utilized by Chitragupta
+
+Our agents leverage both built-in and custom tools to perform their specialized functions effectively.
+
+![Tools Utilized by Chitragupta](docs/Chitragupta_Tools.png)
+
+* **3. Reasoning & Tool Use:**
+    * **Reasoning:** Gemini provides the core reasoning for *all four* agents, each guided by a specialized system prompt.
+    * **Built-in Tool:** The `PersonaGeneratorAgent` uses the `GoogleSearchTool()` to ground its persona creation in real-world data.
+    * **Custom Tool:** The `RedTeamAgent` uses a custom `TargetModelTool` to simulate its interaction with the AI model being tested.
+
+### Session and State Management
+
+The `OrchestratorAgent` intelligently manages the entire red-teaming process through an `InMemorySessionService`, ensuring continuity and context across all agent interactions.
+
+![Session and State Management](docs/Session_State_Management.png)
+
 
 ## 4. Value and Innovation
 
