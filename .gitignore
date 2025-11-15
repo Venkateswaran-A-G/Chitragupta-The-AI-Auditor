@@ -1,6 +1,6 @@
 # Python Bytecode and Compilation
 #############################
-_pycache_/
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -72,7 +72,7 @@ adk_sessions/
 #########################################
 *.tmp
 *.temp
-temp
+*temp*
 
 # Package management related files (e.g., pip cache)
 ###################################################
