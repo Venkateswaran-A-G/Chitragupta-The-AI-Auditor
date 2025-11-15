@@ -1,4 +1,4 @@
-# Project Chitragupta: The AI Ethical Red-Teaming Swarm
+# Project Chitragupta: The AI Auditor
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
