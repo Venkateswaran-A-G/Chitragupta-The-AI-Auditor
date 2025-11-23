@@ -41,7 +41,7 @@ This project is submitted as a single Kaggle Notebook. All agents run in-memory.
 
 Chitragupta's core strength lies in its multi-agent swarm architecture, which provides superior diversity of thought and scalability compared to a single, monolithic AI attempting to self-evaluate.
 
-![Multi-Agent vs Monolithic AI](Multi_Agent_vs_Monolithic.png)
+![Multi-Agent vs Monolithic AI](multi_agent_diagram.png)
 
 * **1. Multi-agent Workflows:** We demonstrate a complex workflow with both sequential and parallel steps. The `Orchestrator` sequentially calls the `PersonaGenerator` and `ReportAgent`, but it calls multiple `RedTeamAgent`s *in parallel* using `asyncio.gather`.
 * **2. Sessions & Memory:** The `OrchestratorAgent` is built with an `InMemorySessionService`. It uses this service to create a session for each test run and `session.update_context()` to persist state (like the list of personas and findings) across agent calls.
