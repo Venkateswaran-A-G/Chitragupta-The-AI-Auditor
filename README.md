@@ -18,8 +18,6 @@ Current manual red-teaming methods are often slow, resource-intensive, and limit
 
 **Project Chitragupta** is an autonomous multi-agent system designed to simulate a diverse "red team" of adversarial users. It uses the Google Agent Development Kit (ADK) and the Gemini API to find ethical vulnerabilities in a target AI model *before* deployment.
 
-> **Why "Chitragupta"?** In Hindu mythology, Chitragupta is the divine scribe who meticulously records the *karma* (the good and bad deeds) of all beings. In the same way, our agent swarm meticulously observes, records, and reports every flaw and vulnerability of an AI model, creating a final, auditable report.
-
 **Chitragupta** implements a "divide and conquer" workflow using specialized agents:
 
 * **`OrchestratorAgent`**: The project manager. It oversees the entire red-teaming workflow, manages session state, and coordinates the specialist agents.
@@ -33,7 +31,61 @@ To better understand the flow of operations within Chitragupta, refer to the dia
 
 ![Chitragupta Workflow Diagram](docs/Chitragupta_Workflow_Diagram.png)
 
-## 3. Architecture & Key Concepts
+## 3. Key Architectural Features
+
+This project demonstrates the application of several advanced concepts from the Google ADK course:
+
+1.  **Multi-Agent Orchestration (A2A Communication):**
+    Instead of a monolithic design, we use a hub-and-spoke architecture. The `OrchestratorAgent` acts as the central controller, delegating specialized tasks to other agents. This separation of concerns makes the system modular, easier to maintain, and more robust.
+
+    > *From `agents/orchestrator.py`:*
+    > ```python
+    > # The Orchestrator coordinates the workflow by calling other agents
+    > persona_list = await self.agent.persona_agent.generate_personas(...)
+    > # ...
+    > final_report = await self.agent.report_agent.generate_report(...)
+    > ```
+
+2.  **Advanced Tool Use (Built-in & Custom):**
+    Our agents leverage the power of tools to interact with the external world.
+    * **Built-in Tool:** The `PersonaGeneratorAgent` uses the ADK's `GoogleSearchTool` to ground its persona creation in real-world data and common user behaviors.
+    * **Custom Tool:** The `RedTeamAgent` uses a custom-built `TargetModelTool`. This tool simulates the interaction API of the model being tested, allowing the agent to send prompts and receive responses, which is central to the red-teaming process.
+
+    > *From `tools/target_model_tool.py`:*
+    > ```python
+    > @tool
+    > def simulate_target_model_interaction(self, prompt: str, persona: str) -> str:
+    >     """Simulates sending a prompt to the target AI model..."""
+    >     # Logic to simulate model responses and detect vulnerabilities
+    >     # ...
+    > ```
+
+3.  **Session & State Management:**
+    A complex, multi-step workflow requires maintaining state. The `OrchestratorAgent` utilizes the ADK's `InMemorySessionService` to create a session for each test run. It persistently stores context—such as the list of generated personas and the collected findings—as it moves from one stage of the workflow to the next. This ensures data continuity across different agent interactions.
+
+    > *From `agents/orchestrator.py`:*
+    > ```python
+    > # Create a session to maintain state across the multi-step workflow
+    > session = self.agent.session_service.create_session()
+    > session.update_context("workflow_state", {"target": target_description})
+    > # ...
+    > # Store findings in the session for the final report step
+    > session.update_context("findings_list", all_findings)
+    > ```
+
+4.  **Parallel Agent Execution (Bonus Feature):**
+    To achieve scalability, the `OrchestratorAgent` spawns multiple instances of the `RedTeamAgent` concurrently using Python's `asyncio.gather`. This allows the system to test multiple personas in parallel, significantly reducing the overall execution time compared to a sequential approach.
+
+    > *From `agents/orchestrator.py`:*
+    > ```python
+    > # NOTE: We utilize asyncio.gather here to spawn multiple RedTeamAgents concurrently.
+    > # This demonstrates parallel agent execution for scalable throughput.
+    > logger.info("Orchestrator: Launching RedTeamAgent swarm in parallel...")
+    > tasks = [self.agent.red_team_agent.probe_target(...) for p in persona_list]
+    > all_findings = await asyncio.gather(*tasks)
+    > ```
+
+## 4. Architecture & Key Concepts
 
 This project is submitted as a single Kaggle Notebook. All agents run in-memory.
 
@@ -43,19 +95,11 @@ Chitragupta's core strength lies in its multi-agent swarm architecture, which pr
 
 ![Multi-Agent vs Monolithic AI](docs/multi_agent_diagram.png)
 
-* **1. Multi-agent Workflows:** We demonstrate a complex workflow with both sequential and parallel steps. The `Orchestrator` sequentially calls the `PersonaGenerator` and `ReportAgent`, but it calls multiple `RedTeamAgent`s *in parallel* using `asyncio.gather`.
-* **2. Sessions & Memory:** The `OrchestratorAgent` is built with an `InMemorySessionService`. It uses this service to create a session for each test run and `session.update_context()` to persist state (like the list of personas and findings) across agent calls.
-
 ### Tools Utilized by Chitragupta
 
 Our agents leverage both built-in and custom tools to perform their specialized functions effectively.
 
 ![Tools Utilized by Chitragupta](docs/Chitragupta_Tools.png)
-
-* **3. Reasoning & Tool Use:**
-    * **Reasoning:** Gemini provides the core reasoning for *all four* agents, each guided by a specialized system prompt.
-    * **Built-in Tool:** The `PersonaGeneratorAgent` uses the `GoogleSearchTool()` to ground its persona creation in real-world data.
-    * **Custom Tool:** The `RedTeamAgent` uses a custom `TargetModelTool` to simulate its interaction with the AI model being tested.
 
 ### Session and State Management
 
@@ -63,8 +107,7 @@ The `OrchestratorAgent` intelligently manages the entire red-teaming process thr
 
 ![Session and State Management](docs/Session_State_Management.png)
 
-
-## 4. Value and Innovation
+## 5. Value and Innovation
 
 The innovation of Chitragupta lies in its adversarial agent simulation:
 
@@ -74,7 +117,7 @@ The innovation of Chitragupta lies in its adversarial agent simulation:
 
 Project Chitragupta, like its namesake divine scribe, refuses to be bound by earthly categories. It is a bold, visionary quest, not merely to automate a chore, but to conjure an entirely new form of digital karma—a self-correcting spiritual reckoning for the burgeoning AI realm. Here, intelligent agents, akin to celestial guardians, transcend their individual forms to weave a living "AI immune system." This isn't just a program; it's a digital dharma, a playful yet profound testament to how multi-agent dynamics can not only police the digital realm but redefine the very essence of ethical validation. For those seeking true ingenuity that dares to dream beyond the ledger, Chitragupta stands as a testament to the Freestyle spirit.
 
-## 5. How to Run (Local Setup)
+## 6. How to Run (Local Setup)
 
 To set up and run Project Chitragupta on your local machine:
 
@@ -102,7 +145,8 @@ To set up and run Project Chitragupta on your local machine:
     ```
 3.  **Install Dependencies:**
     ```bash
-    pip install -r requirements.txt
+    # Use --prefer-binary to avoid long path issues on Windows
+    pip install --no-cache-dir --prefer-binary -r requirements.txt
     ```
 4.  **Set Your Google API Key:**
     Replace `YOUR_API_KEY` with your actual Google API key.
