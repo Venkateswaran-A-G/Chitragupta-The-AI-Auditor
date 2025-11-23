@@ -178,6 +178,58 @@ Project Chitragupta runs as a client-server application. You will need **two sep
     ```
     You will see client logs showing progress, and eventually, the final vulnerability report will be printed to this terminal.
 
+## 7. Deployment (Google Cloud Run)
+
+This project is designed to be easily containerized and deployed to a serverless platform like Google Cloud Run. This allows the `OrchestratorAgent` and its swarm to run continuously in the cloud, ready to accept red-teaming requests from any authorized client.
+
+We have included a `Dockerfile` in the repository that defines the container image for the agent server.
+
+### Prerequisites for Deployment
+
+* A Google Cloud Platform (GCP) project.
+* The Google Cloud CLI (`gcloud`) installed and configured.
+* Docker installed locally (for building the image).
+* Artifact Registry API and Cloud Run API enabled in your GCP project.
+
+### Deployment Steps
+
+1.  **Build the Docker Image:**
+    Use Cloud Build to build the image from the `Dockerfile` and store it in the Google Container Registry (GCR).
+    ```bash
+    # Replace PROJECT_ID with your Google Cloud Project ID
+    gcloud builds submit --tag gcr.io/PROJECT_ID/chitragupta-server
+    ```
+
+2.  **Deploy to Cloud Run:**
+    Deploy the image as a serverless service. You must provide your Google API key as an environment variable at runtime.
+
+    ```bash
+    gcloud run deploy chitragupta-server \
+      --image gcr.io/PROJECT_ID/chitragupta-server \
+      --platform managed \
+      --region us-central1 \
+      --allow-unauthenticated \
+      --set-env-vars GOOGLE_API_KEY=YOUR_ACTUAL_API_KEY
+    ```
+
+After successful deployment, Cloud Run will provide a secure, public URL for your service (e.g., `https://chitragupta-server-xyz.a.run.app`).
+
+### Using the Deployed Agent
+
+To use the deployed swarm, update the `client.py` file to point to the new Cloud Run URL instead of localhost:
+
+```python
+# In client.py
+async def run_client():
+    # ...
+    orchestrator_agent_remote = RemoteA2aAgent(
+        host="[https://chitragupta-server-xyz.a.run.app](https://chitragupta-server-xyz.a.run.app)", # Your new Cloud Run URL
+        agent_name="OrchestratorAgent"
+    )
+    # ...
+```
+Then, running the client.py script locally will trigger the remote workflow running in the cloud.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
