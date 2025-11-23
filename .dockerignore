@@ -1,0 +1,19 @@
+# Ignore the Dockerfile itself
+Dockerfile
+
+# Ignore the README and diagrams, they aren't needed to run the code
+README.md
+docs/
+
+# Ignore local virtual environments and cache
+venv/
+__pycache__/
+.pytest_cache/
+.git/
+.gitignore
+
+# Ignore sensitive local environment files
+.env
+
+# Ignore the client script, as only the server (main.py) runs in this container
+client.py
